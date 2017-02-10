@@ -2,7 +2,7 @@
 Generate maze procedurally, and find it's solution.
 
 - Generation:
-  - Uninformed DFS
+  - DFS Backtracking
  
 - Solution :
   - Uninformed DFS (Random)
