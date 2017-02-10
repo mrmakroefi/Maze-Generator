@@ -1,9 +1,10 @@
 # Maze-Generator
 Generate maze procedurally, and find it's solution.
 
-Generation:
+- Generation:
   - Uninformed DFS
-Solution :
+ 
+- Solution :
   - Uninformed DFS (Random)
   - A*
 
