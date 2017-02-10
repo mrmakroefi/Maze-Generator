@@ -40,7 +40,7 @@ public class Cell {
         this.gridY = y;
     }
 
-    public void ResetCell() {
+    public void ClearCell() {
         isPath = false;
         genVisited = false;
         searchVisited = false;
@@ -50,6 +50,12 @@ public class Cell {
         SetRightWall(true);
         SetTopWall(true);
         SetBottomWall(true);
+    }
+    
+    public void ResetCell() {
+        isPath = false;
+        searchVisited = false;
+        current = false;
     }
 
     public void SetLeftWall(boolean flag) {
@@ -140,6 +146,61 @@ public class Cell {
         }
     }
 
+    
+    public Cell aStarSearchCheckNeighbors() {
+        ArrayList<Cell> neighbors = new ArrayList<>();
+
+        int leftIndex = getIndex(gridX - 1, gridY);
+        Cell left = leftIndex > -1 ? maze.grid.get(leftIndex) : null;
+
+        int rightIndex = getIndex(gridX + 1, gridY);
+        Cell right = rightIndex > -1 ? maze.grid.get(rightIndex) : null;
+
+        int topIndex = getIndex(gridX, gridY - 1);
+        Cell top = topIndex > -1 ? maze.grid.get(topIndex) : null;
+
+        int bottomIndex = getIndex(gridX, gridY + 1);
+        Cell bottom = bottomIndex > -1 ? maze.grid.get(bottomIndex) : null;
+
+        if (right != null && !right.searchVisited && !wall[1] && !right.wall[0]) {
+            neighbors.add(right);
+        }
+        if (bottom != null && !bottom.searchVisited && !wall[3] && !bottom.wall[2]) {
+            neighbors.add(bottom);
+        }
+        if (left != null && !left.searchVisited && !wall[0] && !left.wall[1]) {
+            neighbors.add(left);
+        }
+        if (top != null && !top.searchVisited && !wall[2] && !top.wall[3]) {
+            neighbors.add(top);
+        }
+
+        if (neighbors.size() > 0) {
+            Cell next;
+            
+            next = neighbors.get(0);
+            
+            if (neighbors.size() > 1){
+                for(int i = 0; i < neighbors.size()-1;i++){
+                    int currentDeltaX = maze.cols-1 - neighbors.get(i).gridX;
+                    int currentDeltaY = maze.rows-1 - neighbors.get(i).gridY;
+                    int currentTotalDelta = currentDeltaX+currentDeltaY;
+
+                    int nextDeltaX = maze.cols-1 - neighbors.get(i+1).gridX;
+                    int nextDeltaY = maze.rows-1 - neighbors.get(i+1).gridY;
+                    int nextTotalDelta = nextDeltaX+nextDeltaY;
+                    
+                    if (currentTotalDelta > nextTotalDelta){
+                        next = neighbors.get(i+1);
+                    }
+                }
+            }
+            return next;
+        } else {
+            return null;
+        }
+    }
+
     public void UpdateGraphics() {
 
         if (current) {
@@ -150,7 +211,9 @@ public class Cell {
         }else if (goal) {
             // red
             g.setColor(Color.red);
-        } else if (genVisited) {
+        }else if (searchVisited){
+            g.setColor(new Color(10,50,80));
+        }else if (genVisited) {
             // blue
             g.setColor(new Color(40, 80, 110));
         } else {

@@ -6,4 +6,5 @@ public interface IMaze {
     void OnGenerateEnd();
     void OnSearchStart();
     void OnSearchEnd();
+    void OnResetEnd();
 }
