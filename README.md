@@ -3,10 +3,11 @@ Generate maze procedurally, and find it's solution.
 
 - Generation:
   - DFS Backtracking
+  - Randomized Kruskal's Algorithm
  
 - Solution :
   - Uninformed DFS (Random)
-  - A*
+  - A* (need to be optimized)
 
 Mini project/Tugas akhir dari mata kuliah Kecerdasan Buatan.
 
