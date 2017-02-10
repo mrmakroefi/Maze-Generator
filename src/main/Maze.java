@@ -21,7 +21,7 @@ public class Maze {
     int cols, rows;
     int w;
     ArrayList<Cell> grid = new ArrayList<>();
-    Cell current;
+    Cell current, prev;
     Stack<Cell> stack = new Stack<>();
 
     public Maze(Graphics2D g, int cols, int rows, int w) {
@@ -39,6 +39,16 @@ public class Maze {
         current = grid.get(0);
         current.genVisited = true;
         current.current = true;
+        prev = current;
+    }
+
+    public void ClearMaze() {
+        for (int i = 0; i < grid.size(); i++) {
+            grid.get(i).ClearCell();
+        }
+        current = grid.get(0);
+        prev = current;
+        UpdateGraphics();
     }
 
     public void ResetMaze() {
@@ -46,13 +56,23 @@ public class Maze {
             grid.get(i).ResetCell();
         }
         current = grid.get(0);
+        current.current = true;
+        prev = current;
         UpdateGraphics();
+        for (IMaze maze : listeners) {
+            maze.OnResetEnd();
+        }
     }
 
     public void UpdateGraphics() {
         for (int i = 0; i < grid.size(); i++) {
             grid.get(i).UpdateGraphics();
         }
+    }
+
+    public void UpdateCurrentCellGraphic() {
+        prev.UpdateGraphics();
+        current.UpdateGraphics();
     }
 
     public void Generate() throws InterruptedException {
@@ -67,7 +87,9 @@ public class Maze {
                     while (true) {
                         current.genVisited = true;
                         current.current = true;
-                        UpdateGraphics();
+
+                        //UpdateGraphics();
+                        UpdateCurrentCellGraphic();
 
                         Cell next = current.genCheckNeighbors();
                         if (next != null) {
@@ -76,9 +98,13 @@ public class Maze {
                             stack.push(current);
 
                             current.current = false;
+
+                            prev = current;
                             current = next;
                         } else if (!stack.isEmpty()) {
                             current.current = false;
+
+                            prev = current;
                             current = stack.pop();
                         } else {
                             break;
@@ -109,19 +135,27 @@ public class Maze {
         }
 
         Thread search = new Thread() {
+            @Override
             public void run() {
                 try {
                     while (true) {
                         current.searchVisited = true;
                         current.current = true;
-                        UpdateGraphics();
+
+                        //UpdateGraphics();
+                        UpdateCurrentCellGraphic();
+
                         Cell next = current.searchCheckNeighbors();
                         if (next != null) {
                             stack.push(current);
                             current.current = false;
+
+                            prev = current;
                             current = next;
                         } else if (!stack.isEmpty()) {
                             current.current = false;
+
+                            prev = current;
                             current = stack.pop();
                         } else {
                             break;
@@ -150,6 +184,63 @@ public class Maze {
 
         // start search for solution
         search.start();
+    }
+
+    public void AStarSearch() throws InterruptedException {
+        for (IMaze maze : listeners) {
+            maze.OnSearchStart();
+        }
+
+        Thread aStarSearch = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        current.searchVisited = true;
+                        current.current = true;
+
+                        //UpdateGraphics();
+                        UpdateCurrentCellGraphic();
+
+                        Cell next = current.aStarSearchCheckNeighbors();
+                        if (next != null) {
+                            stack.push(current);
+                            current.current = false;
+
+                            prev = current;
+                            current = next;
+                        } else if (!stack.isEmpty()) {
+                            current.current = false;
+
+                            prev = current;
+                            current = stack.pop();
+                        } else {
+                            break;
+                        }
+
+                        if (current.goal == true) {
+                            current.current = true;
+                            while (!stack.isEmpty()) {
+                                stack.pop().isPath = true;
+                            }
+                            UpdateGraphics();
+                            break;
+                        }
+
+                        Thread.sleep(10);
+                    }
+
+                    for (IMaze maze : listeners) {
+                        maze.OnSearchEnd();
+                    }
+                } catch (InterruptedException v) {
+                    System.out.println(v);
+                }
+            }
+        };
+
+        // start search
+        aStarSearch.start();
     }
 
     void removeWalls(Cell current, Cell next) {
