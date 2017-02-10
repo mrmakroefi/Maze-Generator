@@ -44,8 +44,8 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
         generateButton = new javax.swing.JButton();
         solutionButton = new javax.swing.JButton();
         mazePanel = new javax.swing.JPanel();
-        resetButton = new javax.swing.JButton();
         searchComboBox = new javax.swing.JComboBox();
+        generateComboBox = new javax.swing.JComboBox();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -102,21 +102,23 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
             .addGap(0, 505, Short.MAX_VALUE)
         );
 
-        resetButton.setText("Reset");
-        resetButton.setActionCommand("resetButton");
-        resetButton.setEnabled(false);
-        resetButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                resetButtonActionPerformed(evt);
-            }
-        });
-
-        searchComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        searchComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1" }));
         searchComboBox.addAncestorListener(new javax.swing.event.AncestorListener() {
             public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
             }
             public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
                 OnSearchComboBox(evt);
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
+
+        generateComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1" }));
+        generateComboBox.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                OnGenerateComboBox(evt);
             }
             public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
             }
@@ -135,7 +137,7 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(generateButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(resetButton)
+                        .addComponent(generateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(searchComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -151,8 +153,8 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(generateButton)
                     .addComponent(solutionButton)
-                    .addComponent(resetButton)
-                    .addComponent(searchComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(searchComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(generateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 11, Short.MAX_VALUE))
         );
 
@@ -164,13 +166,21 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
         maze.ClearMaze();
 
         try {
-            maze.Generate();
+            switch (generateComboBox.getSelectedIndex()) {
+                case 0:
+                    maze.Generate();
+                    break;
+                case 1:
+                    maze.KruskalGenerate();
+                    break;
+            }
         } catch (InterruptedException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_generateButtonActionPerformed
 
     private void solutionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solutionButtonActionPerformed
+        maze.ResetMaze();
         try {
             switch (searchComboBox.getSelectedIndex()) {
                 case 0:
@@ -191,10 +201,6 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
         maze.UpdateGraphics();
     }//GEN-LAST:event_OnMazePanel
 
-    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
-        maze.ResetMaze();
-    }//GEN-LAST:event_resetButtonActionPerformed
-
     private void OnSearchComboBox(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_OnSearchComboBox
         searchComboBox.removeAllItems();
         // item 0
@@ -202,6 +208,14 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
         // item 1
         searchComboBox.addItem("A*");
     }//GEN-LAST:event_OnSearchComboBox
+
+    private void OnGenerateComboBox(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_OnGenerateComboBox
+        generateComboBox.removeAllItems();
+        // item 0
+        generateComboBox.addItem("DFS Backtracker");
+        // item 1
+        generateComboBox.addItem("Kruskal's Algorithm");
+    }//GEN-LAST:event_OnGenerateComboBox
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -237,9 +251,9 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton generateButton;
+    private javax.swing.JComboBox generateComboBox;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel mazePanel;
-    private javax.swing.JButton resetButton;
     private javax.swing.JComboBox searchComboBox;
     private javax.swing.JButton solutionButton;
     // End of variables declaration//GEN-END:variables
@@ -248,7 +262,6 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
     public void OnGenerateStart() {
         generateButton.setEnabled(false);
         solutionButton.setEnabled(false);
-        resetButton.setEnabled(false);
         System.out.println("generate start");
     }
 
@@ -269,15 +282,8 @@ public class MainWindow extends javax.swing.JFrame implements IMaze {
     @Override
     public void OnSearchEnd() {
         generateButton.setEnabled(true);
-        solutionButton.setEnabled(false);
-        resetButton.setEnabled(true);
+        solutionButton.setEnabled(true);
         System.out.println("search end");
     }
 
-    @Override
-    public void OnResetEnd() {
-        solutionButton.setEnabled(true);
-        resetButton.setEnabled(false);
-        System.out.println("reset end");
-    }
 }
