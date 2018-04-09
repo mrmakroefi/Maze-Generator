@@ -7,7 +7,7 @@ Generate maze procedurally, and find it's solution.
  
 - Solution :
   - Uninformed DFS (Random)
-  - A* (in progress)
+  - Informed DFS
 
 Mini project/Tugas akhir dari mata kuliah Kecerdasan Buatan.
 
